@@ -11,7 +11,7 @@ public class Dialogs
 
     public static string Prompt(string message) 
     {
-        Console.WriteLine(message);
+        Console.Write(message);
         return Console.ReadLine()!;
     }
 }

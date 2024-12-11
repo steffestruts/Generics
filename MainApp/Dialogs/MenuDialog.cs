@@ -34,7 +34,8 @@ public class MenuDialog(ProductService productService, UserService userService)
                     ViewUsersDialog();
                     break;
                 // Going extra path. Trying adding a new case here, quit the application.
-                case "Q":
+                case "q":
+                    Environment.Exit(-1);
                     return;
                 default:
                     Console.WriteLine("Invalid option. Try again.");
@@ -55,17 +56,30 @@ public class MenuDialog(ProductService productService, UserService userService)
 
         var result = _productService.SaveProduct(product);
 
-        // Console.WriteLine("Product added successfully.");
-        // Console.ReadKey();
+        if (result.Success)
+        {
+            Console.WriteLine("Product was created successfully.");
+        }
+        else
+        {
+            Console.WriteLine($"{result.Message}");
+        }
+
+        Console.ReadKey();
     }
 
     public void ViewProductsDialog()
     {
         Dialogs.MenuHeading("PRODUCTS");
 
-        foreach (var product in _productService.GetProducts())
+        var items = _productService.GetAllProducts().Result!;
+
+        if (items.Any())
         {
-            Console.WriteLine($"{product.Id} - {product.Title} ({product.Price} SEK)");
+            foreach (var product in _productService.GetAllProducts().Result!)
+            {
+                Console.WriteLine($"{product.Id} - {product.Title} ({product.Price} SEK)");
+            }
         }
         Console.ReadKey();
     }
@@ -76,14 +90,37 @@ public class MenuDialog(ProductService productService, UserService userService)
 
         var user = new User
         {
-            Name = Dialogs.Prompt("Enter user name: "),
-            LastName = Dialogs.Prompt("Enter user last name: "),
-            Email = Dialogs.Prompt("Enter user email: ")
+            FirstName = Dialogs.Prompt("Enter first name: "),
+            LastName = Dialogs.Prompt("Enter last name: "),
+            Email = Dialogs.Prompt("Enter email: ")
         };
 
         var result = _userService.SaveUser(user);
 
-        // Console.WriteLine("User added successfully.");
-        // Console.ReadKey();
+        if (!result.Success)
+        {
+            Console.WriteLine("User was added successfully.");
+        }
+        else
+        {
+            Console.WriteLine($"{result.Message}");
+        }
+
+        Console.ReadKey();
+    }
+
+    public void ViewUsersDialog()
+    {
+        Dialogs.MenuHeading("USERS");
+        var items = _userService.GetAllUsers().Result!;
+
+        if (items.Any())
+        {
+            foreach (var user in items)
+            {
+                Console.WriteLine($"{user.Id} - {user.FirstName} {user.LastName} <{user.Email}>");
+            }
+        }
+        Console.ReadKey();
     }
 }
